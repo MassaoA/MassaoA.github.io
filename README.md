@@ -1,2 +1,288 @@
-# MassaoA.github.io
-Whey Calculator
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Calculadora de Custo-Benefício de Whey</title>
+<style>
+  :root {
+    --bg: #f7f7f8;
+    --card-bg: #ffffff;
+    --text: #1a1a1a;
+    --text-muted: #6b6b6b;
+    --border: #e2e2e4;
+    --accent: #2563eb;
+    --accent-light: #eff4ff;
+    --best: #16a34a;
+    --best-bg: #f0fdf4;
+    --danger: #dc2626;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #16161a;
+      --card-bg: #1f1f24;
+      --text: #f0f0f0;
+      --text-muted: #a0a0a8;
+      --border: #333338;
+      --accent: #5b8def;
+      --accent-light: #1e2a44;
+      --best: #4ade80;
+      --best-bg: #12291c;
+      --danger: #f87171;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #16161a;
+    --card-bg: #1f1f24;
+    --text: #f0f0f0;
+    --text-muted: #a0a0a8;
+    --border: #333338;
+    --accent: #5b8def;
+    --accent-light: #1e2a44;
+    --best: #4ade80;
+    --best-bg: #12291c;
+    --danger: #f87171;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    padding: 20px;
+  }
+  .container { max-width: 900px; margin: 0 auto; }
+  h1 { font-size: 1.4rem; margin-bottom: 4px; }
+  p.subtitle { color: var(--text-muted); margin-top: 0; margin-bottom: 20px; font-size: 0.9rem; }
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .field label {
+    display: block;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+  }
+  .field input {
+    width: 100%;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    color: var(--text);
+    font-size: 0.95rem;
+  }
+  .field input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  .product-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+  .product-header h3 {
+    margin: 0;
+    font-size: 0.95rem;
+  }
+  .remove-btn {
+    background: none;
+    border: none;
+    color: var(--danger);
+    cursor: pointer;
+    font-size: 0.85rem;
+    padding: 4px 8px;
+  }
+  .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px; }
+  button.primary {
+    background: var(--accent);
+    color: white;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    cursor: pointer;
+  }
+  button.secondary {
+    background: transparent;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    cursor: pointer;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    overflow-x: auto;
+    display: block;
+  }
+  thead, tbody { width: 100%; }
+  th, td {
+    text-align: left;
+    padding: 10px 8px;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9rem;
+    white-space: nowrap;
+  }
+  th { color: var(--text-muted); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; }
+  tr.best { background: var(--best-bg); }
+  tr.best td:first-child { font-weight: 700; color: var(--best); }
+  .badge {
+    display: inline-block;
+    background: var(--best);
+    color: white;
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 999px;
+    margin-left: 6px;
+  }
+  .empty-state {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    text-align: center;
+    padding: 20px;
+  }
+  .results-wrap { overflow-x: auto; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🥤 Calculadora de Custo-Benefício de Whey</h1>
+  <p class="subtitle">Compare produtos pelo custo real por grama de proteína</p>
+
+  <div class="card" id="product-1">
+    <div class="field" style="margin-bottom:10px;">
+      <label>Nome do produto</label>
+      <input type="text" id="name-1" placeholder="Ex: Whey Growth 900g">
+    </div>
+    <div class="product-grid">
+      <div class="field">
+        <label>Preço (R$)</label>
+        <input type="number" step="0.01" id="price-1" placeholder="150.00">
+      </div>
+      <div class="field">
+        <label>Peso total (g)</label>
+        <input type="number" step="1" id="weight-1" placeholder="900">
+      </div>
+      <div class="field">
+        <label>Tamanho porção (g)</label>
+        <input type="number" step="0.1" id="serving-1" placeholder="30">
+      </div>
+      <div class="field">
+        <label>Proteína/porção (g)</label>
+        <input type="number" step="0.1" id="protein-1" placeholder="24">
+      </div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="primary" onclick="calculate()">Calcular e adicionar à lista</button>
+    <button class="secondary" onclick="clearList()">Limpar lista</button>
+  </div>
+
+  <div class="card" id="results-card" style="display:none;">
+    <h3 style="margin-top:0;">Comparação</h3>
+    <div class="results-wrap">
+      <table id="results-table">
+        <thead>
+          <tr>
+            <th>Produto</th>
+            <th>Proteína total (g)</th>
+            <th>Custo / g proteína</th>
+            <th>vs. melhor</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="results-body"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+let results = [];
+
+function calculate() {
+  const name = document.getElementById('name-1').value.trim() || `Produto ${results.length + 1}`;
+  const price = parseFloat(document.getElementById('price-1').value);
+  const weight = parseFloat(document.getElementById('weight-1').value);
+  const serving = parseFloat(document.getElementById('serving-1').value);
+  const protein = parseFloat(document.getElementById('protein-1').value);
+
+  if (!price || !weight || !serving || !protein) {
+    alert('Preencha todos os campos com valores válidos.');
+    return;
+  }
+
+  const numServings = weight / serving;
+  const totalProtein = numServings * protein;
+  const costPerGram = price / totalProtein;
+
+  results.push({ name, totalProtein, costPerGram });
+  renderResults();
+
+  // Limpa os campos para o próximo produto, mantendo o formulário pronto
+  document.getElementById('name-1').value = '';
+  document.getElementById('price-1').value = '';
+  document.getElementById('weight-1').value = '';
+  document.getElementById('serving-1').value = '';
+  document.getElementById('protein-1').value = '';
+  document.getElementById('name-1').focus();
+}
+
+function removeResult(index) {
+  results.splice(index, 1);
+  renderResults();
+}
+
+function clearList() {
+  results = [];
+  renderResults();
+}
+
+function renderResults() {
+  const resultsCard = document.getElementById('results-card');
+  const tbody = document.getElementById('results-body');
+  tbody.innerHTML = '';
+
+  if (results.length === 0) {
+    resultsCard.style.display = 'none';
+    return;
+  }
+
+  resultsCard.style.display = 'block';
+
+  const sorted = [...results].sort((a, b) => a.costPerGram - b.costPerGram);
+  const best = sorted[0].costPerGram;
+
+  sorted.forEach((r) => {
+    const isBest = r.costPerGram === best;
+    const diffPct = isBest ? 0 : ((r.costPerGram - best) / best * 100);
+    const originalIndex = results.indexOf(r);
+    const tr = document.createElement('tr');
+    if (isBest) tr.className = 'best';
+    tr.innerHTML = `
+      <td>${r.name}${isBest ? '<span class="badge">Melhor</span>' : ''}</td>
+      <td>${r.totalProtein.toFixed(0)} g</td>
+      <td>R$ ${r.costPerGram.toFixed(3)}</td>
+      <td>${isBest ? '—' : '+' + diffPct.toFixed(1) + '%'}</td>
+      <td><button class="remove-btn" onclick="removeResult(${originalIndex})">Remover</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+</script>
+</body>
+</html>
